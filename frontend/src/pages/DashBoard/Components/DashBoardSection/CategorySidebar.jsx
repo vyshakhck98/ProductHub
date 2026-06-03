@@ -3,19 +3,23 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useSubCategories } from "./hooks/useSubCategories";
 
-const CategorySidebar = ({ categories, selected, onSelect }) => {
-  const { subCategories } = useSubCategories();
-
+const CategorySidebar = ({ categories, subCategories, selected, onSelect }) => {
   const subsByCategoryId = useMemo(() => {
     const map = {};
+
     subCategories.forEach((sub) => {
       const catId = sub.category?._id || sub.category;
+
       if (!catId) return;
-      if (!map[catId]) map[catId] = [];
+
+      if (!map[catId]) {
+        map[catId] = [];
+      }
+
       map[catId].push(sub);
     });
+
     return map;
   }, [subCategories]);
 
@@ -43,7 +47,9 @@ const CategorySidebar = ({ categories, selected, onSelect }) => {
             sx={{
               background: "transparent",
               boxShadow: "none",
-              "&:before": { display: "none" },
+              "&:before": {
+                display: "none",
+              },
             }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>

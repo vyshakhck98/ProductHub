@@ -1,19 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import { useNavigate } from "react-router-dom";
 
-const HeaderSection = ({ onWishlistOpen }) => {
+const HeaderSection = ({ onWishlistOpen, onSearch }) => {
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    onSearch(search);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
     <header className="bg-[#004B73] h-[90px] px-16 flex items-center justify-between">
-      {/* Search */}
       <div className="flex items-center mx-auto w-[520px]">
         <input
           type="text"
+          value={search}
           placeholder="Search any things"
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           className="flex-1 h-[42px] bg-white px-5 rounded-l-full outline-none text-sm"
         />
-
-        <button className="h-[42px] px-8 bg-[#F4A911] text-white rounded-r-full text-sm font-medium">
+        <button
+          onClick={handleSearch}
+          className="h-[42px] px-8 bg-[#F4A911] text-white rounded-r-full text-sm font-medium"
+        >
           Search
         </button>
       </div>
@@ -27,7 +44,9 @@ const HeaderSection = ({ onWishlistOpen }) => {
           <span>Wishlist</span>
         </div>
 
-        <span className="cursor-pointer">Sign In</span>
+        <span onClick={handleLogout} className="cursor-pointer hover:text-[#F4A911] transition-colors">
+          Logout
+        </span>
 
         <div className="flex items-center gap-2 cursor-pointer">
           <ShoppingCartOutlinedIcon sx={{ fontSize: 18 }} />

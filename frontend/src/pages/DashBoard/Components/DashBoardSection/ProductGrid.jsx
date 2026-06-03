@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -12,11 +12,14 @@ const FALLBACK = "https://pngimg.com/uploads/laptop/laptop_PNG101816.png";
 const getImageUrl = (images) =>
   images?.length > 0 ? `http://localhost:5000${images[0]}` : FALLBACK;
 
-const ProductGrid = ({ subcategory }) => {
+const ProductGrid = ({ subcategory, query }) => {
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+
+  // Reset to page 1 whenever query or subcategory changes
+  useEffect(() => {
+    setPage(1);
+  }, [query, subcategory]);
 
   const { products, totalPages, total, loading } = useProducts(
     query,
@@ -25,41 +28,18 @@ const ProductGrid = ({ subcategory }) => {
   );
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
-  const handleSearch = () => {
-    setPage(1);
-    setQuery(search);
-  };
-
   const handleWishlistToggle = async (e, productId) => {
     e.stopPropagation();
     try {
       if (isInWishlist(productId)) await removeFromWishlist(productId);
       else await addToWishlist(productId);
     } catch {
-      // for silently fail
+      // silently fail
     }
   };
 
   return (
     <div className="flex-1">
-      {/* Search */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={search}
-          placeholder="Search products..."
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm outline-none focus:border-[#F4A911]"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-[#F4A911] text-white px-5 py-2 rounded-full text-sm"
-        >
-          Search
-        </button>
-      </div>
-
       {loading && (
         <div className="flex justify-center items-center h-48">
           <CircularProgress sx={{ color: "#F4A911" }} />

@@ -1,8 +1,6 @@
 import { useState, useCallback } from "react";
 import { useCategories } from "./Components/DashBoardSection/hooks/useCategories";
 import { useSubCategories } from "./Components/DashBoardSection/hooks/useSubCategories";
-
-
 import HeaderSection from "./Components/HeaderSection/HeaderSection";
 import WishlistSidebar from "./Components/WishList/WishList";
 import CategorySidebar from "./Components/DashBoardSection/CategorySidebar";
@@ -16,23 +14,31 @@ import Link from "@mui/material/Link";
 
 const Dashboard = () => {
   const { categories, fetchCategories } = useCategories();
-  const { fetchSubCategories } = useSubCategories();
+  const { subCategories, fetchSubCategories } = useSubCategories();
 
   const [selected, setSelected] = useState("");
+  const [query, setQuery] = useState("");
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [openAddCategory, setOpenAddCategory] = useState(false);
   const [openAddSubCategory, setOpenAddSubCategory] = useState(false);
   const [openAddProduct, setOpenAddProduct] = useState(false);
-
   const [productRefreshKey, setProductRefreshKey] = useState(0);
+
   const handleProductAdded = useCallback(() => {
     setProductRefreshKey((k) => k + 1);
+  }, []);
+
+  const handleSearch = useCallback((value) => {
+    setQuery(value);
   }, []);
 
   return (
     <>
       <div className="min-h-screen bg-[#FAFAFA]">
-        <HeaderSection onWishlistOpen={() => setWishlistOpen(true)} />
+        <HeaderSection
+          onWishlistOpen={() => setWishlistOpen(true)}
+          onSearch={handleSearch}
+        />
 
         <div className="mx-auto px-8 py-8">
           {/* Top bar */}
@@ -75,33 +81,38 @@ const Dashboard = () => {
           <div className="flex gap-8">
             <CategorySidebar
               categories={categories}
+              subCategories={subCategories}
               selected={selected}
               onSelect={setSelected}
             />
-            <ProductGrid key={productRefreshKey} subcategory={selected} />
+            <ProductGrid
+              key={productRefreshKey}
+              subcategory={selected}
+              query={query}
+            />
           </div>
         </div>
       </div>
 
-      <WishlistSidebar  // Used to open wish list sidebar
+      <WishlistSidebar
         open={wishlistOpen}
         onClose={() => setWishlistOpen(false)}
       />
 
-      <AddCategoryModal  // Used to add new category 
+      <AddCategoryModal
         open={openAddCategory}
         onClose={() => setOpenAddCategory(false)}
         onSuccess={fetchCategories}
       />
 
-      <AddSubCategoryModal  // Used to add new sub category
+      <AddSubCategoryModal
         open={openAddSubCategory}
         onClose={() => setOpenAddSubCategory(false)}
         categories={categories}
         onSuccess={fetchSubCategories}
       />
 
-      <AddProductModal  // Used to add new product 
+      <AddProductModal
         open={openAddProduct}
         onClose={() => setOpenAddProduct(false)}
         onSuccess={handleProductAdded}
